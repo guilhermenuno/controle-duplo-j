@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle de Duplo J</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>Controle de Duplo J</h1>
+
+  <h2>Dashboard</h2>
+  <p>
+    Pacientes ativos: <span id="totalPacientes">0</span> |
+    Vencidos: <span id="totalVencidos">0</span> |
+    Convocar imagem: <span id="totalImagem">0</span>
+  </p>
+
+  <input type="text" id="busca" placeholder="Buscar por nome ou registro">
+
+  <hr>
+
+  <h2>Login</h2>
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="senha" placeholder="Senha">
+  <button id="login">Entrar</button>
+  <p id="mensagem"></p>
+
+  <hr>
+
+  <h2>Cadastrar paciente</h2>
+  <input type="text" id="nome" placeholder="Nome do paciente">
+  <input type="text" id="registro" placeholder="Registro hospitalar">
+  <input type="text" id="telefone" placeholder="Telefone">
+  <input type="date" id="dataColocacao">
+  <input type="text" id="observacoes" placeholder="Observações">
+  <button id="salvarPaciente">Salvar paciente</button>
+  <p id="mensagemCadastro"></p>
+
+  <hr>
+
+  <h2>Pacientes</h2>
+  <button id="carregar">Atualizar lista</button>
+
+  <h3>🔴 Vencidos ( > 3 meses )</h3>
+  <div id="listaVencidos"></div>
+
+  <h3>🟣 Convocar consulta / imagem ( > 6 meses )</h3>
+  <div id="listaImagem"></div>
+
+  <h3>🟢 No prazo</h3>
+  <div id="listaPrazo"></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
