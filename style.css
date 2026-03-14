@@ -1,0 +1,44 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 40px;
+  background: #f5f5f5;
+}
+
+h1 {
+  margin-bottom: 30px;
+}
+
+input {
+  display: block;
+  width: 350px;
+  max-width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+button {
+  padding: 10px 14px;
+  margin-top: 5px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.paciente {
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 8px;
+  background: white;
+}
+
+.noPrazo {
+  background: #d4f7d4;
+}
+
+.vencido3 {
+  background: #ffd4d4;
+}
+
+.vencido6 {
+  background: #e5d4ff;
+}
