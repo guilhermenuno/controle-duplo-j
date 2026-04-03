@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle de Duplo J</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="layout">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Urologia</p>
+        <h1>Controle de Duplo J</h1>
+        <p class="subtitle">Painel simples para acompanhar prazo, retirada e convocação de pacientes.</p>
+      </div>
+      <div class="session-card">
+        <p class="session-label">Sessão</p>
+        <strong id="statusSessao">Não autenticado</strong>
+        <span id="usuarioLogado" class="session-user">Faça login para liberar o sistema</span>
+        <button id="logout" class="secondary-button" hidden>Sair</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-header">
+        <div>
+          <p class="section-kicker">Resumo</p>
+          <h2>Dashboard</h2>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <article class="stat-card">
+          <span class="stat-label">Pacientes ativos</span>
+          <strong id="totalPacientes">0</strong>
+        </article>
+        <article class="stat-card warning">
+          <span class="stat-label">Vencidos</span>
+          <strong id="totalVencidos">0</strong>
+        </article>
+        <article class="stat-card accent">
+          <span class="stat-label">Convocar imagem</span>
+          <strong id="totalImagem">0</strong>
+        </article>
+        <article class="stat-card neutral">
+          <span class="stat-label">Retirados</span>
+          <strong id="totalRetirados">0</strong>
+        </article>
+      </div>
+
+      <input type="text" id="busca" placeholder="Buscar por nome ou registro" disabled>
+    </section>
+
+    <section class="grid">
+      <section class="card">
+        <div class="section-header">
+          <div>
+            <p class="section-kicker">Acesso</p>
+            <h2>Login</h2>
+          </div>
+        </div>
+
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="senha" placeholder="Senha">
+        <button id="login">Entrar</button>
+        <p id="mensagem" class="helper-text"></p>
+      </section>
+
+      <section class="card">
+        <div class="section-header">
+          <div>
+            <p class="section-kicker">Cadastro</p>
+            <h2>Novo paciente</h2>
+          </div>
+        </div>
+
+        <input type="text" id="nome" placeholder="Nome do paciente" disabled>
+        <input type="text" id="registro" placeholder="Registro hospitalar" disabled>
+        <input type="text" id="telefone" placeholder="Telefone" disabled>
+        <input type="date" id="dataColocacao" disabled>
+        <input type="text" id="observacoes" placeholder="Observações" disabled>
+        <button id="salvarPaciente" disabled>Salvar paciente</button>
+        <p id="mensagemCadastro" class="helper-text"></p>
+      </section>
+    </section>
+
+    <section class="card">
+      <div class="section-header section-header-inline">
+        <div>
+          <p class="section-kicker">Monitoramento</p>
+          <h2>Pacientes</h2>
+        </div>
+        <div class="actions-row">
+          <button id="exportarCsv" class="secondary-button" disabled>Exportar CSV</button>
+          <button id="carregar" class="secondary-button" disabled>Atualizar lista</button>
+        </div>
+      </div>
+
+      <div class="list-group">
+        <h3>Vencidos ( &gt; 3 meses )</h3>
+        <div id="listaVencidos" class="patient-list">
+          <p class="empty-state">Faça login para visualizar os pacientes.</p>
+        </div>
+      </div>
+
+      <div class="list-group">
+        <h3>Convocar consulta / imagem ( &gt; 6 meses )</h3>
+        <div id="listaImagem" class="patient-list"></div>
+      </div>
+
+      <div class="list-group">
+        <h3>No prazo</h3>
+        <div id="listaPrazo" class="patient-list"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-header section-header-inline">
+        <div>
+          <p class="section-kicker">Histórico</p>
+          <h2>Retirados</h2>
+        </div>
+      </div>
+
+      <div id="listaRetirados" class="patient-list">
+        <p class="empty-state">Faça login para visualizar o histórico.</p>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
