@@ -173,6 +173,12 @@ for update
 using (public.is_approved_user())
 with check (public.is_approved_user());
 
+drop policy if exists "pacientes_delete_admin_only" on public.pacientes;
+create policy "pacientes_delete_admin_only"
+on public.pacientes
+for delete
+using (public.is_admin_user());
+
 drop policy if exists "audit_select_approved" on public.patient_audit_log;
 create policy "audit_select_approved"
 on public.patient_audit_log
@@ -206,6 +212,12 @@ on public.pacientes_troca_programada
 for update
 using (public.is_approved_user())
 with check (public.is_approved_user());
+
+drop policy if exists "trocas_delete_admin_only" on public.pacientes_troca_programada;
+create policy "trocas_delete_admin_only"
+on public.pacientes_troca_programada
+for delete
+using (public.is_admin_user());
 
 -- Após executar o script, promova o primeiro administrador manualmente:
 -- update public.profiles

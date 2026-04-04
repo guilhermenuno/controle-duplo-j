@@ -168,6 +168,10 @@ function actorName(userId) {
   return state.profilesMap.get(userId) || userId
 }
 
+function isAdmin() {
+  return state.currentProfile?.role === "admin"
+}
+
 function setAuthTab(tab) {
   const isLogin = tab === "login"
   tabLogin.classList.toggle("is-active", isLogin)
@@ -440,9 +444,18 @@ function renderPatientCard(patient, mode) {
         </div>
         ${
           isHistory
-            ? ""
+            ? isAdmin()
+              ? `<div class="patient-actions">
+                   <button type="button" class="danger-button" data-action="excluir-paciente" data-id="${patient.id}">Excluir registro</button>
+                 </div>`
+              : ""
             : `<div class="patient-actions">
                 <button type="button" data-action="retirar-paciente" data-id="${patient.id}">DJ retirado</button>
+                ${
+                  isAdmin()
+                    ? `<button type="button" class="danger-button" data-action="excluir-paciente" data-id="${patient.id}">Excluir registro</button>`
+                    : ""
+                }
               </div>`
         }
       </div>
@@ -486,6 +499,11 @@ function renderTrocaCard(item, statusKey) {
           <button type="button" data-action="editar-troca" data-id="${item.id}">Editar programação</button>
           <button type="button" class="secondary-button" data-action="registrar-troca" data-id="${item.id}">Registrar troca hoje</button>
           <button type="button" class="secondary-button" data-action="encerrar-troca" data-id="${item.id}">Encerrar controle</button>
+          ${
+            isAdmin()
+              ? `<button type="button" class="danger-button" data-action="excluir-troca" data-id="${item.id}">Excluir registro</button>`
+              : ""
+          }
         </div>
       </div>
     `,
@@ -881,6 +899,46 @@ async function markPatientRemoved(id) {
   await loadPatients()
 }
 
+async function deletePatientRecord(id) {
+  if (!isAdmin()) {
+    setText(mensagemSistema, "Apenas administradores podem excluir registros.")
+    return
+  }
+
+  if (!window.confirm("Excluir definitivamente este registro de paciente? Esta ação não pode ser desfeita.")) {
+    return
+  }
+
+  const { data: patient, error: loadError } = await supabase
+    .from("pacientes")
+    .select("*")
+    .eq("id", id)
+    .single()
+
+  if (loadError) {
+    setText(mensagemSistema, "Erro ao localizar registro: " + loadError.message)
+    return
+  }
+
+  const { error } = await supabase
+    .from("pacientes")
+    .delete()
+    .eq("id", id)
+
+  if (error) {
+    setText(mensagemSistema, "Erro ao excluir registro: " + error.message)
+    return
+  }
+
+  await insertAuditLog("pacientes", "delete", id, {
+    nome: patient.nome,
+    registro_hospitalar: patient.registro_hospitalar
+  })
+
+  setText(mensagemSistema, "Registro excluído com sucesso.")
+  await loadPatients()
+}
+
 async function saveTrocaProgramada() {
   if (!state.currentUser || !state.currentProfile?.approved) {
     setText(mensagemTroca, "Seu usuário precisa estar aprovado para salvar trocas.")
@@ -1032,6 +1090,46 @@ async function closeTrocaControl(id) {
   await loadTrocasProgramadas()
 }
 
+async function deleteTrocaRecord(id) {
+  if (!isAdmin()) {
+    setText(mensagemSistema, "Apenas administradores podem excluir registros.")
+    return
+  }
+
+  if (!window.confirm("Excluir definitivamente esta programação de troca? Esta ação não pode ser desfeita.")) {
+    return
+  }
+
+  const { data: item, error: loadError } = await supabase
+    .from("pacientes_troca_programada")
+    .select("*")
+    .eq("id", id)
+    .single()
+
+  if (loadError) {
+    setText(mensagemSistema, "Erro ao localizar troca: " + loadError.message)
+    return
+  }
+
+  const { error } = await supabase
+    .from("pacientes_troca_programada")
+    .delete()
+    .eq("id", id)
+
+  if (error) {
+    setText(mensagemSistema, "Erro ao excluir troca: " + error.message)
+    return
+  }
+
+  await insertAuditLog("pacientes_troca_programada", "delete", id, {
+    nome: item.nome,
+    registro_hospitalar: item.registro_hospitalar
+  })
+
+  setText(mensagemSistema, "Programação excluída com sucesso.")
+  await loadTrocasProgramadas()
+}
+
 async function approveUser(id) {
   const { error } = await supabase
     .from("profiles")
@@ -1137,9 +1235,11 @@ document.addEventListener("click", async (event) => {
   if (!action || !id) return
 
   if (action === "retirar-paciente") await markPatientRemoved(id)
+  if (action === "excluir-paciente") await deletePatientRecord(id)
   if (action === "editar-troca") await loadTrocaIntoForm(id)
   if (action === "registrar-troca") await registerTrocaToday(id)
   if (action === "encerrar-troca") await closeTrocaControl(id)
+  if (action === "excluir-troca") await deleteTrocaRecord(id)
   if (action === "aprovar-usuario") await approveUser(id)
   if (action === "rejeitar-usuario") await rejectUser(id)
 })

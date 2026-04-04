@@ -101,6 +101,11 @@ textarea:disabled {
   color: var(--primary-strong);
 }
 
+.danger-button {
+  background: rgba(150, 43, 43, 0.12);
+  color: var(--danger);
+}
+
 .tab-button {
   background: transparent;
   color: var(--muted);
