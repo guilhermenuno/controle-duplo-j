@@ -4,130 +4,354 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Controle de Duplo J</title>
+  <meta name="theme-color" content="#0e5b52">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="assets/favicon.ico?v=6" sizes="any">
+  <link rel="icon" href="assets/favicon.svg?v=5" sizes="any" type="image/svg+xml">
+  <link rel="icon" href="assets/favicon-32.png?v=5" sizes="32x32" type="image/png">
+  <link rel="icon" href="assets/favicon-16.png?v=5" sizes="16x16" type="image/png">
+  <link rel="shortcut icon" href="assets/favicon.ico?v=6">
+  <link rel="mask-icon" href="assets/favicon.svg?v=5" color="#0e5b52">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=5">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="layout">
-    <section class="hero">
-      <div>
-        <p class="eyebrow">Urologia</p>
-        <h1>Controle de Duplo J</h1>
-        <p class="subtitle">Painel simples para acompanhar prazo, retirada e convocação de pacientes.</p>
-      </div>
-      <div class="session-card">
-        <p class="session-label">Sessão</p>
-        <strong id="statusSessao">Não autenticado</strong>
-        <span id="usuarioLogado" class="session-user">Faça login para liberar o sistema</span>
-        <button id="logout" class="secondary-button" hidden>Sair</button>
-      </div>
-    </section>
-
-    <section class="card">
-      <div class="section-header">
-        <div>
-          <p class="section-kicker">Resumo</p>
-          <h2>Dashboard</h2>
-        </div>
-      </div>
-
-      <div class="stats-grid">
-        <article class="stat-card">
-          <span class="stat-label">Pacientes ativos</span>
-          <strong id="totalPacientes">0</strong>
-        </article>
-        <article class="stat-card warning">
-          <span class="stat-label">Vencidos</span>
-          <strong id="totalVencidos">0</strong>
-        </article>
-        <article class="stat-card accent">
-          <span class="stat-label">Convocar imagem</span>
-          <strong id="totalImagem">0</strong>
-        </article>
-        <article class="stat-card neutral">
-          <span class="stat-label">Retirados</span>
-          <strong id="totalRetirados">0</strong>
-        </article>
-      </div>
-
-      <input type="text" id="busca" placeholder="Buscar por nome ou registro" disabled>
-    </section>
-
-    <section class="grid">
-      <section class="card">
-        <div class="section-header">
+  <main class="site-shell">
+    <section id="authView" class="auth-view">
+      <div class="auth-panel auth-card">
+        <div class="auth-brandline">
+          <img src="assets/logo.svg" alt="Logo Controle de Duplo J" class="auth-brand-logo">
           <div>
-            <p class="section-kicker">Acesso</p>
-            <h2>Login</h2>
+            <p class="eyebrow">Serviço clínico</p>
+            <h1>Controle de Duplo J</h1>
           </div>
         </div>
 
-        <input type="email" id="email" placeholder="Email">
-        <input type="password" id="senha" placeholder="Senha">
-        <button id="login">Entrar</button>
-        <p id="mensagem" class="helper-text"></p>
-      </section>
-
-      <section class="card">
-        <div class="section-header">
+        <div class="auth-card-header">
           <div>
-            <p class="section-kicker">Cadastro</p>
-            <h2>Novo paciente</h2>
+            <p class="eyebrow">Acesso ao sistema</p>
+            <h2>Entrar</h2>
           </div>
         </div>
 
-        <input type="text" id="nome" placeholder="Nome do paciente" disabled>
-        <input type="text" id="registro" placeholder="Registro hospitalar" disabled>
-        <input type="text" id="telefone" placeholder="Telefone" disabled>
-        <input type="date" id="dataColocacao" disabled>
-        <input type="text" id="observacoes" placeholder="Observações" disabled>
-        <button id="salvarPaciente" disabled>Salvar paciente</button>
-        <p id="mensagemCadastro" class="helper-text"></p>
-      </section>
+        <p class="auth-intro">Controle interno de retirada e trocas programadas de cateter duplo J.</p>
+
+        <div class="auth-tabs">
+          <button id="tabLogin" class="tab-button is-active" type="button">Login</button>
+          <button id="tabCadastro" class="tab-button" type="button">Solicitar acesso</button>
+        </div>
+
+        <section id="loginPanel" class="auth-form-panel">
+          <label class="field-label" for="email">Email institucional</label>
+          <input type="email" id="email" placeholder="nome@servico.br">
+
+          <label class="field-label" for="senha">Senha</label>
+          <input type="password" id="senha" placeholder="Sua senha">
+
+          <button id="login" type="button">Entrar</button>
+          <p id="mensagem" class="helper-text"></p>
+        </section>
+
+        <section id="cadastroPanel" class="auth-form-panel is-hidden">
+          <label class="field-label" for="cadastroNome">Nome completo</label>
+          <input type="text" id="cadastroNome" placeholder="Nome e sobrenome">
+
+          <label class="field-label" for="cadastroEmail">Email</label>
+          <input type="email" id="cadastroEmail" placeholder="nome@servico.br">
+
+          <label class="field-label" for="cadastroSenha">Senha inicial</label>
+          <input type="password" id="cadastroSenha" placeholder="Crie uma senha">
+
+          <button id="solicitarAcesso" type="button">Solicitar acesso</button>
+          <p id="mensagemCadastroAcesso" class="helper-text"></p>
+        </section>
+
+        <section id="pendingPanel" class="status-panel is-hidden">
+          <p class="eyebrow">Aguardando liberação</p>
+          <h3>Acesso pendente de aprovação</h3>
+          <p>
+            Seu usuário foi identificado, mas ainda não foi liberado por um administrador. Quando a aprovação ocorrer, faça login novamente.
+          </p>
+          <button id="logoutPending" type="button" class="secondary-button">Sair</button>
+        </section>
+
+        <section id="setupPanel" class="status-panel is-hidden">
+          <p class="eyebrow">Configuração necessária</p>
+          <h3>Segurança ainda não ativada</h3>
+          <p>
+            O sistema precisa do script <code>supabase-setup.sql</code> executado no Supabase para liberar login aprovado, perfis e auditoria.
+          </p>
+        </section>
+      </div>
     </section>
 
-    <section class="card">
-      <div class="section-header section-header-inline">
-        <div>
-          <p class="section-kicker">Monitoramento</p>
-          <h2>Pacientes</h2>
+    <section id="appView" class="app-shell is-hidden">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <img src="assets/logo.svg" alt="Logo Controle de Duplo J" class="brand-logo brand-logo-small">
+          <div>
+            <p class="eyebrow">Serviço Clínico</p>
+            <strong>Controle de Duplo J</strong>
+          </div>
         </div>
-        <div class="actions-row">
-          <button id="exportarCsv" class="secondary-button" disabled>Exportar CSV</button>
-          <button id="carregar" class="secondary-button" disabled>Atualizar lista</button>
+
+        <nav class="sidebar-nav">
+          <button id="navCadastroRetirada" class="nav-link" type="button">Cadastro retirada</button>
+          <button id="navCadastroTroca" class="nav-link" type="button">Cadastro troca</button>
+          <button id="navListaRetirada" class="nav-link" type="button">Em acompanhamento</button>
+          <button id="navHistoricoRetirada" class="nav-link" type="button">Histórico retirados</button>
+          <button id="navListaTroca" class="nav-link" type="button">Lista trocas</button>
+          <button id="navAcesso" class="nav-link is-hidden" type="button">Gestão de acesso</button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <span id="statusSessao" class="status-badge">Não autenticado</span>
+          <div class="session-box">
+            <strong id="usuarioLogado">-</strong>
+            <span id="perfilUsuario" class="muted-line">-</span>
+          </div>
+          <button id="logout" type="button" class="secondary-button">Sair</button>
         </div>
-      </div>
+      </aside>
 
-      <div class="list-group">
-        <h3>Vencidos ( &gt; 3 meses )</h3>
-        <div id="listaVencidos" class="patient-list">
-          <p class="empty-state">Faça login para visualizar os pacientes.</p>
-        </div>
-      </div>
+      <div class="app-content">
+        <header class="topbar">
+          <button id="toggleSidebar" type="button" class="menu-toggle" aria-label="Abrir menu" aria-expanded="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+          <div>
+            <p class="eyebrow">Painel clínico</p>
+            <h1 id="pageTitle">Visão geral</h1>
+          </div>
+          <div class="toolbar">
+            <input type="text" id="busca" placeholder="Buscar por nome ou registro" disabled>
+            <button id="exportarCsv" type="button" class="secondary-button" disabled>Exportar CSV</button>
+            <button id="carregar" type="button" class="secondary-button" disabled>Atualizar</button>
+          </div>
+        </header>
 
-      <div class="list-group">
-        <h3>Convocar consulta / imagem ( &gt; 6 meses )</h3>
-        <div id="listaImagem" class="patient-list"></div>
-      </div>
+        <section id="dashboardSection" class="page-section">
+          <div class="grid two-columns">
+            <section class="card">
+              <div class="card-heading">
+                <div>
+                  <p class="eyebrow">Resumo operacional</p>
+                  <h2>Retirada / acompanhamento</h2>
+                </div>
+              </div>
 
-      <div class="list-group">
-        <h3>No prazo</h3>
-        <div id="listaPrazo" class="patient-list"></div>
-      </div>
-    </section>
+              <div class="stats-grid stats-grid-4">
+                <article class="stat-card">
+                  <span class="stat-label">Pacientes ativos</span>
+                  <strong id="totalPacientes">0</strong>
+                </article>
+                <article class="stat-card warning">
+                  <span class="stat-label">Vencidos</span>
+                  <strong id="totalVencidos">0</strong>
+                </article>
+                <article class="stat-card accent">
+                  <span class="stat-label">Convocar imagem</span>
+                  <strong id="totalImagem">0</strong>
+                </article>
+                <article class="stat-card neutral">
+                  <span class="stat-label">Retirados</span>
+                  <strong id="totalRetirados">0</strong>
+                </article>
+              </div>
+            </section>
 
-    <section class="card">
-      <div class="section-header section-header-inline">
-        <div>
-          <p class="section-kicker">Histórico</p>
-          <h2>Retirados</h2>
-        </div>
-      </div>
+            <section class="card">
+              <div class="card-heading">
+                <div>
+                  <p class="eyebrow">Resumo operacional</p>
+                  <h2>Trocas programadas</h2>
+                </div>
+              </div>
 
-      <div id="listaRetirados" class="patient-list">
-        <p class="empty-state">Faça login para visualizar o histórico.</p>
+              <div class="stats-grid stats-grid-3">
+                <article class="stat-card teal">
+                  <span class="stat-label">Trocas programadas</span>
+                  <strong id="totalTrocas">0</strong>
+                </article>
+                <article class="stat-card gold">
+                  <span class="stat-label">Trocas vencendo</span>
+                  <strong id="totalTrocasProximas">0</strong>
+                </article>
+                <article class="stat-card warning">
+                  <span class="stat-label">Trocas atrasadas</span>
+                  <strong id="totalTrocasAtrasadas">0</strong>
+                </article>
+              </div>
+            </section>
+          </div>
+
+          <p id="mensagemSistema" class="helper-text"></p>
+        </section>
+
+        <section id="cadastroRetiradaSection" class="page-section is-hidden">
+          <section class="card">
+            <div class="card-heading">
+              <div>
+                <p class="eyebrow">Cadastro</p>
+                <h2>Novo paciente de retirada</h2>
+              </div>
+            </div>
+
+            <label class="field-label" for="nome">Nome do paciente</label>
+            <input type="text" id="nome" placeholder="Nome do paciente" disabled>
+
+            <label class="field-label" for="registro">Registro hospitalar</label>
+            <input type="text" id="registro" placeholder="Registro hospitalar" disabled>
+
+            <label class="field-label" for="telefone">Contato</label>
+            <input type="text" id="telefone" placeholder="Telefone" disabled>
+
+            <label class="field-label" for="dataColocacao">Data de colocação</label>
+            <input type="date" id="dataColocacao" disabled>
+
+            <label class="field-label" for="observacoes">Observações</label>
+            <textarea id="observacoes" placeholder="Notas clínicas relevantes" disabled></textarea>
+
+            <button id="salvarPaciente" type="button" disabled>Salvar paciente</button>
+            <p id="mensagemCadastro" class="helper-text"></p>
+          </section>
+        </section>
+
+        <section id="listaRetiradaSection" class="page-section is-hidden">
+          <section class="card">
+            <div class="card-heading">
+              <div>
+                <p class="eyebrow">Monitoramento</p>
+                <h2>Pacientes em acompanhamento</h2>
+              </div>
+            </div>
+
+            <div class="list-group">
+              <h3>Vencidos ( &gt; 3 meses )</h3>
+              <div id="listaVencidos" class="patient-list"></div>
+            </div>
+
+            <div class="list-group">
+              <h3>Convocar consulta / imagem ( &gt; 6 meses )</h3>
+              <div id="listaImagem" class="patient-list"></div>
+            </div>
+
+            <div class="list-group">
+              <h3>No prazo</h3>
+              <div id="listaPrazo" class="patient-list"></div>
+            </div>
+          </section>
+        </section>
+
+        <section id="historicoRetiradaSection" class="page-section is-hidden">
+          <section class="card">
+            <div class="card-heading">
+              <div>
+                <p class="eyebrow">Histórico</p>
+                <h2>Pacientes com DJ retirado</h2>
+              </div>
+            </div>
+            <div id="listaRetirados" class="patient-list">
+              <p class="empty-state">Nenhum paciente retirado.</p>
+            </div>
+          </section>
+        </section>
+
+        <section id="cadastroTrocaSection" class="page-section is-hidden">
+          <section class="card">
+            <div class="card-heading">
+              <div>
+                <p class="eyebrow">Programação</p>
+                <h2 id="trocaFormTitulo">Novo paciente de troca periódica</h2>
+              </div>
+            </div>
+
+            <input type="hidden" id="trocaId">
+
+            <label class="field-label" for="trocaNome">Nome do paciente</label>
+            <input type="text" id="trocaNome" placeholder="Nome do paciente" disabled>
+
+            <label class="field-label" for="trocaRegistro">Registro hospitalar</label>
+            <input type="text" id="trocaRegistro" placeholder="Registro hospitalar" disabled>
+
+            <label class="field-label" for="trocaTelefone">Contato</label>
+            <input type="text" id="trocaTelefone" placeholder="Telefone" disabled>
+
+            <label class="field-label" for="trocaUltimaData">Última troca realizada</label>
+            <input type="date" id="trocaUltimaData" disabled>
+
+            <div class="grid compact-grid">
+              <div>
+                <label class="field-label" for="trocaIntervaloMeses">Intervalo em meses</label>
+                <input type="number" id="trocaIntervaloMeses" min="0" value="3" disabled>
+              </div>
+              <div>
+                <label class="field-label" for="trocaIntervaloDias">Intervalo em dias</label>
+                <input type="number" id="trocaIntervaloDias" min="0" value="0" disabled>
+              </div>
+            </div>
+
+            <label class="field-label" for="trocaObservacoes">Observações</label>
+            <textarea id="trocaObservacoes" placeholder="Notas sobre rotina de troca" disabled></textarea>
+
+            <div class="actions-row">
+              <button id="salvarTroca" type="button" disabled>Salvar programação</button>
+              <button id="cancelarEdicaoTroca" type="button" class="secondary-button is-hidden">Cancelar edição</button>
+            </div>
+            <p id="mensagemTroca" class="helper-text"></p>
+          </section>
+        </section>
+
+        <section id="listaTrocaSection" class="page-section is-hidden">
+          <section class="card">
+            <div class="card-heading">
+              <div>
+                <p class="eyebrow">Controle periódico</p>
+                <h2>Lista de trocas programadas</h2>
+              </div>
+            </div>
+
+            <p class="helper-text">Os pacientes desta área ficam em controle cíclico, sem saírem definitivamente da lista.</p>
+
+            <div class="list-group">
+              <h3>Trocas atrasadas</h3>
+              <div id="listaTrocaAtrasada" class="patient-list"></div>
+            </div>
+
+            <div class="list-group">
+              <h3>Próximas trocas</h3>
+              <div id="listaTrocaProxima" class="patient-list"></div>
+            </div>
+
+            <div class="list-group">
+              <h3>Programadas no prazo</h3>
+              <div id="listaTrocaPrazo" class="patient-list"></div>
+            </div>
+          </section>
+        </section>
+
+        <section id="acessoSection" class="page-section is-hidden">
+          <section class="card">
+            <div class="card-heading">
+              <div>
+                <p class="eyebrow">Administração</p>
+                <h2>Solicitações de acesso</h2>
+              </div>
+            </div>
+
+            <div id="listaAprovacoes" class="patient-list">
+              <p class="empty-state">Nenhuma solicitação pendente.</p>
+            </div>
+          </section>
+        </section>
       </div>
     </section>
   </main>
+
   <script type="module" src="app.js"></script>
 </body>
 </html>
