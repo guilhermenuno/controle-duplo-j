@@ -69,7 +69,8 @@ p {
 
 button,
 input,
-textarea {
+textarea,
+select {
   font: inherit;
 }
 
@@ -90,7 +91,8 @@ button:hover {
 
 button:disabled,
 input:disabled,
-textarea:disabled {
+textarea:disabled,
+select:disabled {
   opacity: 0.58;
   cursor: not-allowed;
   box-shadow: none;
@@ -124,7 +126,8 @@ textarea:disabled {
 }
 
 input,
-textarea {
+textarea,
+select {
   width: 100%;
   border: 1px solid rgba(14, 91, 82, 0.14);
   border-radius: var(--radius-md);
@@ -133,13 +136,23 @@ textarea {
   color: var(--text);
 }
 
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23607571' d='M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
 textarea {
   min-height: 110px;
   resize: vertical;
 }
 
 input:focus,
-textarea:focus {
+textarea:focus,
+select:focus {
   outline: 2px solid rgba(14, 91, 82, 0.2);
   border-color: rgba(14, 91, 82, 0.5);
 }
@@ -694,6 +707,55 @@ code {
 .troca-ok {
   background: var(--soft-primary);
   color: var(--primary-strong);
+}
+
+.cistoscopia-group {
+  border: 1px solid rgba(14, 91, 82, 0.12);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  background: rgba(14, 91, 82, 0.04);
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--primary-strong);
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.cistoscopia-hint {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.cistoscopia-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #daf3f1;
+  color: #0d655b;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.cistoscopia-badge::before {
+  content: "◉";
+  font-size: 10px;
 }
 
 .empty-state {

@@ -213,8 +213,23 @@
             <label class="field-label" for="telefone">Contato</label>
             <input type="text" id="telefone" placeholder="Telefone" disabled>
 
+            <label class="field-label" for="sexo">Sexo</label>
+            <select id="sexo" disabled>
+              <option value="">Selecione</option>
+              <option value="feminino">Feminino</option>
+              <option value="masculino">Masculino</option>
+            </select>
+
             <label class="field-label" for="dataColocacao">Data de colocação</label>
             <input type="date" id="dataColocacao" disabled>
+
+            <div id="cistoscopiaGroup" class="cistoscopia-group is-hidden">
+              <label class="checkbox-label">
+                <input type="checkbox" id="cistoscopiaQuarta" checked>
+                <span>Agendar para cistoscopia às quartas (manhã)</span>
+              </label>
+              <p class="cistoscopia-hint">Paciente feminina com DJ &lt; 6 meses — elegível para retirada por cistoscopia às quartas pela manhã.</p>
+            </div>
 
             <label class="field-label" for="observacoes">Observações</label>
             <textarea id="observacoes" placeholder="Notas clínicas relevantes" disabled></textarea>

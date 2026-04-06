@@ -97,6 +97,7 @@ const camposProtegidos = [
   document.getElementById("nome"),
   document.getElementById("registro"),
   document.getElementById("telefone"),
+  document.getElementById("sexo"),
   document.getElementById("dataColocacao"),
   document.getElementById("observacoes"),
   document.getElementById("trocaNome"),
@@ -328,8 +329,34 @@ function resetPacienteForm() {
   document.getElementById("nome").value = ""
   document.getElementById("registro").value = ""
   document.getElementById("telefone").value = ""
+  document.getElementById("sexo").value = ""
   document.getElementById("dataColocacao").value = ""
   document.getElementById("observacoes").value = ""
+  document.getElementById("cistoscopiaQuarta").checked = false
+  document.getElementById("cistoscopiaGroup").classList.add("is-hidden")
+}
+
+function checkCistoscopiaEligibility() {
+  const sexo = document.getElementById("sexo").value
+  const dataColocacao = document.getElementById("dataColocacao").value
+  const group = document.getElementById("cistoscopiaGroup")
+  const checkbox = document.getElementById("cistoscopiaQuarta")
+
+  if (sexo === "feminino" && dataColocacao) {
+    const colocacao = new Date(dataColocacao + "T12:00:00")
+    const hoje = new Date()
+    const diffMs = hoje - colocacao
+    const diffMeses = diffMs / (1000 * 60 * 60 * 24 * 30.44)
+
+    if (diffMeses < 6 && diffMeses >= 0) {
+      group.classList.remove("is-hidden")
+      checkbox.checked = true
+      return
+    }
+  }
+
+  group.classList.add("is-hidden")
+  checkbox.checked = false
 }
 
 async function checkSecurityTables() {
@@ -427,8 +454,10 @@ function renderPatientCard(patient, mode) {
         </div>
       </summary>
       <div class="patient-content">
+        ${patient.cistoscopia_quarta && !isHistory ? '<div class="cistoscopia-badge">Cistoscopia às quartas (manhã)</div>' : ''}
         <div class="patient-meta">
           <div class="meta-line"><strong>Contato</strong><span>${patient.telefone || "-"}</span></div>
+          <div class="meta-line"><strong>Sexo</strong><span>${patient.sexo === "feminino" ? "Feminino" : patient.sexo === "masculino" ? "Masculino" : "-"}</span></div>
           <div class="meta-line"><strong>Data do DJ</strong><span>${formatDate(patient.data_colocacao)}</span></div>
           <div class="meta-line"><strong>Prazo 3 meses</strong><span>${formatDate(patient.data_3_meses)}</span></div>
           <div class="meta-line"><strong>Prazo 6 meses</strong><span>${formatDate(patient.data_6_meses)}</span></div>
@@ -834,7 +863,10 @@ async function savePatient() {
   const nome = document.getElementById("nome").value.trim()
   const registro = document.getElementById("registro").value.trim()
   const telefone = document.getElementById("telefone").value.trim()
+  const sexo = document.getElementById("sexo").value
   const dataColocacao = document.getElementById("dataColocacao").value
+  const cistoscopiaQuarta = document.getElementById("cistoscopiaQuarta").checked
+    && !document.getElementById("cistoscopiaGroup").classList.contains("is-hidden")
   const observacoes = document.getElementById("observacoes").value.trim()
 
   if (!nome || !registro || !dataColocacao) {
@@ -846,9 +878,11 @@ async function savePatient() {
     nome,
     registro_hospitalar: registro,
     telefone,
+    sexo: sexo || null,
     data_colocacao: dataColocacao,
     data_3_meses: addMonthsAndDays(dataColocacao, 3, 0),
     data_6_meses: addMonthsAndDays(dataColocacao, 6, 0),
+    cistoscopia_quarta: cistoscopiaQuarta,
     observacoes,
     status: "ativo",
     cadastrado_por: state.currentUser.id
@@ -1183,10 +1217,12 @@ async function exportCsv() {
       patient.nome,
       patient.registro_hospitalar,
       patient.telefone,
+      patient.sexo,
       patient.data_colocacao,
       patient.data_3_meses,
       patient.data_6_meses,
       patient.status,
+      patient.cistoscopia_quarta ? "Sim" : "Não",
       patient.data_retirada,
       actorName(patient.cadastrado_por),
       actorName(patient.retirado_por),
@@ -1200,10 +1236,12 @@ async function exportCsv() {
     "nome",
     "registro_hospitalar",
     "telefone",
+    "sexo",
     "data_colocacao",
     "data_3_meses",
     "data_6_meses",
     "status",
+    "cistoscopia_quarta",
     "data_retirada",
     "incluido_por",
     "retirado_por",
@@ -1293,6 +1331,8 @@ btnSalvarTroca.addEventListener("click", saveTrocaProgramada)
 btnCancelarEdicaoTroca.addEventListener("click", resetTrocaForm)
 btnExportarCsv.addEventListener("click", exportCsv)
 campoBusca.addEventListener("input", applySearch)
+document.getElementById("sexo").addEventListener("change", checkCistoscopiaEligibility)
+document.getElementById("dataColocacao").addEventListener("change", checkCistoscopiaEligibility)
 
 supabase.auth.onAuthStateChange(() => {
   refreshSessionState()
