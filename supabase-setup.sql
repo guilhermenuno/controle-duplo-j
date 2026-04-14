@@ -61,7 +61,14 @@ for each row execute procedure public.set_updated_at();
 
 alter table public.pacientes
   add column if not exists retirado_por uuid references auth.users(id),
-  add column if not exists updated_at timestamptz not null default now();
+  add column if not exists updated_at timestamptz not null default now(),
+  add column if not exists prazo_retirada_meses integer not null default 3,
+  add column if not exists prazo_retirada_dias integer not null default 0,
+  add column if not exists data_prazo_retirada date;
+
+update public.pacientes
+set data_prazo_retirada = coalesce(data_prazo_retirada, data_3_meses, data_colocacao + interval '3 months')
+where data_prazo_retirada is null;
 
 drop trigger if exists pacientes_set_updated_at on public.pacientes;
 create trigger pacientes_set_updated_at

@@ -54,6 +54,7 @@ const btnSolicitarAcesso = document.getElementById("solicitarAcesso")
 const btnCarregar = document.getElementById("carregar")
 const btnExportarCsv = document.getElementById("exportarCsv")
 const btnSalvarPaciente = document.getElementById("salvarPaciente")
+const btnCancelarEdicaoPaciente = document.getElementById("cancelarEdicaoPaciente")
 const btnSalvarTroca = document.getElementById("salvarTroca")
 const btnCancelarEdicaoTroca = document.getElementById("cancelarEdicaoTroca")
 
@@ -86,6 +87,7 @@ const listaTrocaProxima = document.getElementById("listaTrocaProxima")
 const listaTrocaPrazo = document.getElementById("listaTrocaPrazo")
 const listaAprovacoes = document.getElementById("listaAprovacoes")
 
+const pacienteFormTitulo = document.getElementById("pacienteFormTitulo")
 const trocaFormTitulo = document.getElementById("trocaFormTitulo")
 
 const camposProtegidos = [
@@ -99,6 +101,8 @@ const camposProtegidos = [
   document.getElementById("telefone"),
   document.getElementById("sexo"),
   document.getElementById("dataColocacao"),
+  document.getElementById("prazoRetiradaMeses"),
+  document.getElementById("prazoRetiradaDias"),
   document.getElementById("observacoes"),
   document.getElementById("trocaNome"),
   document.getElementById("trocaRegistro"),
@@ -326,14 +330,20 @@ function resetTrocaForm() {
 }
 
 function resetPacienteForm() {
+  document.getElementById("pacienteId").value = ""
   document.getElementById("nome").value = ""
   document.getElementById("registro").value = ""
   document.getElementById("telefone").value = ""
   document.getElementById("sexo").value = ""
   document.getElementById("dataColocacao").value = ""
+  document.getElementById("prazoRetiradaMeses").value = "3"
+  document.getElementById("prazoRetiradaDias").value = "0"
   document.getElementById("observacoes").value = ""
   document.getElementById("cistoscopiaQuarta").checked = false
   document.getElementById("cistoscopiaGroup").classList.add("is-hidden")
+  pacienteFormTitulo.innerText = "Novo paciente de retirada"
+  btnCancelarEdicaoPaciente.classList.add("is-hidden")
+  mensagemCadastro.innerText = ""
 }
 
 function checkCistoscopiaEligibility() {
@@ -431,6 +441,9 @@ function renderPatientCard(patient, mode) {
   const isHistory = mode === "history"
   const createdBy = actorName(patient.cadastrado_por)
   const removedBy = actorName(patient.retirado_por)
+  const prazoMeses = patient.prazo_retirada_meses ?? 3
+  const prazoDias = patient.prazo_retirada_dias ?? 0
+  const dataPrazo = patient.data_prazo_retirada || patient.data_3_meses
   const subtitle = isHistory
     ? `Retirado em ${formatDate(patient.data_retirada)}`
     : patient.visualStatus
@@ -459,8 +472,9 @@ function renderPatientCard(patient, mode) {
           <div class="meta-line"><strong>Contato</strong><span>${patient.telefone || "-"}</span></div>
           <div class="meta-line"><strong>Sexo</strong><span>${patient.sexo === "feminino" ? "Feminino" : patient.sexo === "masculino" ? "Masculino" : "-"}</span></div>
           <div class="meta-line"><strong>Data do DJ</strong><span>${formatDate(patient.data_colocacao)}</span></div>
-          <div class="meta-line"><strong>Prazo 3 meses</strong><span>${formatDate(patient.data_3_meses)}</span></div>
-          <div class="meta-line"><strong>Prazo 6 meses</strong><span>${formatDate(patient.data_6_meses)}</span></div>
+          <div class="meta-line"><strong>Prazo de retirada</strong><span>${prazoMeses} mês(es) e ${prazoDias} dia(s)</span></div>
+          <div class="meta-line"><strong>Data limite de retirada</strong><span>${formatDate(dataPrazo)}</span></div>
+          <div class="meta-line"><strong>Alerta 6 meses</strong><span>${formatDate(patient.data_6_meses)}</span></div>
           <div class="meta-line"><strong>Incluído por</strong><span>${createdBy}</span></div>
           <div class="meta-line"><strong>Incluído em</strong><span>${formatDateTime(patient.created_at)}</span></div>
           ${
@@ -479,6 +493,7 @@ function renderPatientCard(patient, mode) {
                  </div>`
               : ""
             : `<div class="patient-actions">
+                <button type="button" class="secondary-button" data-action="editar-paciente" data-id="${patient.id}">Editar prazo/dados</button>
                 <button type="button" data-action="retirar-paciente" data-id="${patient.id}">DJ retirado</button>
                 ${
                   isAdmin()
@@ -659,7 +674,8 @@ async function loadPatients() {
     patient.visualClass = "noPrazo"
     patient.visualStatus = "No prazo"
 
-    const d3 = new Date(patient.data_3_meses + "T12:00:00")
+    const prazoRetirada = patient.data_prazo_retirada || patient.data_3_meses
+    const dataLimiteRetirada = new Date(prazoRetirada + "T12:00:00")
     const d6 = new Date(patient.data_6_meses + "T12:00:00")
 
     if (hoje >= d6) {
@@ -667,7 +683,7 @@ async function loadPatients() {
       patient.visualStatus = "Convocar consulta / imagem"
       target = listaImagem
       imagem++
-    } else if (hoje >= d3) {
+    } else if (hoje >= dataLimiteRetirada) {
       patient.visualClass = "vencido3"
       patient.visualStatus = "Vencido"
       target = listaVencidos
@@ -860,17 +876,25 @@ async function savePatient() {
     return
   }
 
+  const id = document.getElementById("pacienteId").value
   const nome = document.getElementById("nome").value.trim()
   const registro = document.getElementById("registro").value.trim()
   const telefone = document.getElementById("telefone").value.trim()
   const sexo = document.getElementById("sexo").value
   const dataColocacao = document.getElementById("dataColocacao").value
+  const prazoRetiradaMeses = Number(document.getElementById("prazoRetiradaMeses").value || 0)
+  const prazoRetiradaDias = Number(document.getElementById("prazoRetiradaDias").value || 0)
   const cistoscopiaQuarta = document.getElementById("cistoscopiaQuarta").checked
     && !document.getElementById("cistoscopiaGroup").classList.contains("is-hidden")
   const observacoes = document.getElementById("observacoes").value.trim()
 
   if (!nome || !registro || !dataColocacao) {
     setText(mensagemCadastro, "Preencha nome, registro e data de colocação.")
+    return
+  }
+
+  if (prazoRetiradaMeses <= 0 && prazoRetiradaDias <= 0) {
+    setText(mensagemCadastro, "Defina um prazo de retirada maior que zero.")
     return
   }
 
@@ -882,27 +906,80 @@ async function savePatient() {
     data_colocacao: dataColocacao,
     data_3_meses: addMonthsAndDays(dataColocacao, 3, 0),
     data_6_meses: addMonthsAndDays(dataColocacao, 6, 0),
+    prazo_retirada_meses: prazoRetiradaMeses,
+    prazo_retirada_dias: prazoRetiradaDias,
+    data_prazo_retirada: addMonthsAndDays(dataColocacao, prazoRetiradaMeses, prazoRetiradaDias),
     cistoscopia_quarta: cistoscopiaQuarta,
-    observacoes,
-    status: "ativo",
-    cadastrado_por: state.currentUser.id
+    observacoes
   }
 
-  const { data, error } = await supabase.from("pacientes").insert([payload]).select().single()
+  let response
+  if (id) {
+    response = await supabase
+      .from("pacientes")
+      .update(payload)
+      .eq("id", id)
+      .select()
+      .single()
+  } else {
+    response = await supabase
+      .from("pacientes")
+      .insert([
+        {
+          ...payload,
+          status: "ativo",
+          cadastrado_por: state.currentUser.id
+        }
+      ])
+      .select()
+      .single()
+  }
 
-  if (error) {
-    setText(mensagemCadastro, "Erro ao salvar paciente: " + error.message)
+  if (response.error) {
+    setText(mensagemCadastro, "Erro ao salvar paciente: " + response.error.message)
     return
   }
 
-  await insertAuditLog("pacientes", "insert", data.id, {
+  await insertAuditLog("pacientes", id ? "update" : "insert", response.data.id, {
     nome,
-    registro_hospitalar: registro
+    registro_hospitalar: registro,
+    data_prazo_retirada: payload.data_prazo_retirada,
+    prazo_retirada_meses: prazoRetiradaMeses,
+    prazo_retirada_dias: prazoRetiradaDias
   })
 
   resetPacienteForm()
-  setText(mensagemCadastro, "Paciente salvo com sucesso.")
+  setText(mensagemCadastro, id ? "Paciente atualizado com sucesso." : "Paciente salvo com sucesso.")
   await loadPatients()
+}
+
+async function loadPatientIntoForm(id) {
+  const { data, error } = await supabase
+    .from("pacientes")
+    .select("*")
+    .eq("id", id)
+    .single()
+
+  if (error) {
+    setText(mensagemSistema, "Erro ao carregar paciente: " + error.message)
+    return
+  }
+
+  document.getElementById("pacienteId").value = data.id
+  document.getElementById("nome").value = data.nome || ""
+  document.getElementById("registro").value = data.registro_hospitalar || ""
+  document.getElementById("telefone").value = data.telefone || ""
+  document.getElementById("sexo").value = data.sexo || ""
+  document.getElementById("dataColocacao").value = data.data_colocacao || ""
+  document.getElementById("prazoRetiradaMeses").value = data.prazo_retirada_meses ?? 3
+  document.getElementById("prazoRetiradaDias").value = data.prazo_retirada_dias ?? 0
+  document.getElementById("observacoes").value = data.observacoes || ""
+  document.getElementById("cistoscopiaQuarta").checked = Boolean(data.cistoscopia_quarta)
+  pacienteFormTitulo.innerText = "Editar paciente de retirada"
+  btnCancelarEdicaoPaciente.classList.remove("is-hidden")
+  mensagemCadastro.innerText = ""
+  checkCistoscopiaEligibility()
+  setActiveSection("cadastro-retirada")
 }
 
 async function markPatientRemoved(id) {
@@ -1219,6 +1296,9 @@ async function exportCsv() {
       patient.telefone,
       patient.sexo,
       patient.data_colocacao,
+      patient.prazo_retirada_meses,
+      patient.prazo_retirada_dias,
+      patient.data_prazo_retirada,
       patient.data_3_meses,
       patient.data_6_meses,
       patient.status,
@@ -1238,6 +1318,9 @@ async function exportCsv() {
     "telefone",
     "sexo",
     "data_colocacao",
+    "prazo_retirada_meses",
+    "prazo_retirada_dias",
+    "data_prazo_retirada",
     "data_3_meses",
     "data_6_meses",
     "status",
@@ -1272,6 +1355,7 @@ document.addEventListener("click", async (event) => {
 
   if (!action || !id) return
 
+  if (action === "editar-paciente") await loadPatientIntoForm(id)
   if (action === "retirar-paciente") await markPatientRemoved(id)
   if (action === "excluir-paciente") await deletePatientRecord(id)
   if (action === "editar-troca") await loadTrocaIntoForm(id)
@@ -1327,6 +1411,7 @@ btnLogoutPending.addEventListener("click", async () => {
 })
 btnCarregar.addEventListener("click", loadAllData)
 btnSalvarPaciente.addEventListener("click", savePatient)
+btnCancelarEdicaoPaciente.addEventListener("click", resetPacienteForm)
 btnSalvarTroca.addEventListener("click", saveTrocaProgramada)
 btnCancelarEdicaoTroca.addEventListener("click", resetTrocaForm)
 btnExportarCsv.addEventListener("click", exportCsv)
