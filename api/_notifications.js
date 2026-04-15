@@ -9,7 +9,13 @@ const NOTIFICATION_MESSAGES = {
     "Olá, este é um aviso do serviço de Urologia. Consta acompanhamento de cateter duplo J há mais de 6 meses. Procure o serviço responsável para avaliação."
 }
 
+const DEFAULT_SUPABASE_URL = "https://forbdpfbuuwbqcwvscjq.supabase.co"
+
 function getEnv(name) {
+  if (name === "SUPABASE_URL") {
+    return process.env.SUPABASE_URL || DEFAULT_SUPABASE_URL
+  }
+
   const value = process.env[name]
   if (!value) throw new Error(`Variável de ambiente ausente: ${name}`)
   return value
