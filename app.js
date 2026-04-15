@@ -99,6 +99,8 @@ const camposProtegidos = [
   document.getElementById("nome"),
   document.getElementById("registro"),
   document.getElementById("telefone"),
+  document.getElementById("contatoSmsAutorizado"),
+  document.getElementById("contatoWhatsappAutorizado"),
   document.getElementById("sexo"),
   document.getElementById("dataColocacao"),
   document.getElementById("prazoRetiradaMeses"),
@@ -334,6 +336,8 @@ function resetPacienteForm() {
   document.getElementById("nome").value = ""
   document.getElementById("registro").value = ""
   document.getElementById("telefone").value = ""
+  document.getElementById("contatoSmsAutorizado").checked = false
+  document.getElementById("contatoWhatsappAutorizado").checked = false
   document.getElementById("sexo").value = ""
   document.getElementById("dataColocacao").value = ""
   document.getElementById("prazoRetiradaMeses").value = "3"
@@ -470,6 +474,8 @@ function renderPatientCard(patient, mode) {
         ${patient.cistoscopia_quarta && !isHistory ? '<div class="cistoscopia-badge">Cistoscopia às quartas (manhã)</div>' : ''}
         <div class="patient-meta">
           <div class="meta-line"><strong>Contato</strong><span>${patient.telefone || "-"}</span></div>
+          <div class="meta-line"><strong>SMS autorizado</strong><span>${patient.contato_sms_autorizado ? "Sim" : "Não"}</span></div>
+          <div class="meta-line"><strong>WhatsApp autorizado</strong><span>${patient.contato_whatsapp_autorizado ? "Sim" : "Não"}</span></div>
           <div class="meta-line"><strong>Sexo</strong><span>${patient.sexo === "feminino" ? "Feminino" : patient.sexo === "masculino" ? "Masculino" : "-"}</span></div>
           <div class="meta-line"><strong>Data do DJ</strong><span>${formatDate(patient.data_colocacao)}</span></div>
           <div class="meta-line"><strong>Prazo de retirada</strong><span>${prazoMeses} mês(es) e ${prazoDias} dia(s)</span></div>
@@ -880,6 +886,8 @@ async function savePatient() {
   const nome = document.getElementById("nome").value.trim()
   const registro = document.getElementById("registro").value.trim()
   const telefone = document.getElementById("telefone").value.trim()
+  const contatoSmsAutorizado = document.getElementById("contatoSmsAutorizado").checked
+  const contatoWhatsappAutorizado = document.getElementById("contatoWhatsappAutorizado").checked
   const sexo = document.getElementById("sexo").value
   const dataColocacao = document.getElementById("dataColocacao").value
   const prazoRetiradaMeses = Number(document.getElementById("prazoRetiradaMeses").value || 0)
@@ -902,6 +910,8 @@ async function savePatient() {
     nome,
     registro_hospitalar: registro,
     telefone,
+    contato_sms_autorizado: contatoSmsAutorizado,
+    contato_whatsapp_autorizado: contatoWhatsappAutorizado,
     sexo: sexo || null,
     data_colocacao: dataColocacao,
     data_3_meses: addMonthsAndDays(dataColocacao, 3, 0),
@@ -950,6 +960,9 @@ async function savePatient() {
 
   resetPacienteForm()
   setText(mensagemCadastro, id ? "Paciente atualizado com sucesso." : "Paciente salvo com sucesso.")
+  if (!id) {
+    await requestPatientNotification(response.data.id, "cadastro", mensagemCadastro)
+  }
   await loadPatients()
 }
 
@@ -969,6 +982,8 @@ async function loadPatientIntoForm(id) {
   document.getElementById("nome").value = data.nome || ""
   document.getElementById("registro").value = data.registro_hospitalar || ""
   document.getElementById("telefone").value = data.telefone || ""
+  document.getElementById("contatoSmsAutorizado").checked = Boolean(data.contato_sms_autorizado)
+  document.getElementById("contatoWhatsappAutorizado").checked = Boolean(data.contato_whatsapp_autorizado)
   document.getElementById("sexo").value = data.sexo || ""
   document.getElementById("dataColocacao").value = data.data_colocacao || ""
   document.getElementById("prazoRetiradaMeses").value = data.prazo_retirada_meses ?? 3
@@ -980,6 +995,45 @@ async function loadPatientIntoForm(id) {
   mensagemCadastro.innerText = ""
   checkCistoscopiaEligibility()
   setActiveSection("cadastro-retirada")
+}
+
+async function requestPatientNotification(patientId, notificationType, messageNode = mensagemSistema) {
+  const { data: sessionData } = await supabase.auth.getSession()
+  const token = sessionData.session?.access_token
+
+  if (!token) {
+    setText(messageNode, "Paciente salvo, mas a notificação não foi enviada porque a sessão expirou.")
+    return
+  }
+
+  try {
+    const response = await fetch("/api/send-notification", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        patientId,
+        notificationType
+      })
+    })
+
+    const result = await response.json().catch(() => ({}))
+
+    if (!response.ok) {
+      setText(messageNode, `Paciente salvo, mas houve erro na notificação: ${result.error || response.statusText}`)
+      return
+    }
+
+    if (result.sent > 0) {
+      setText(messageNode, `Paciente salvo com sucesso. Notificação enviada por ${result.channels.join(" e ")}.`)
+    } else if (result.skipped) {
+      setText(messageNode, `Paciente salvo com sucesso. Notificação não enviada: ${result.skipped}.`)
+    }
+  } catch (error) {
+    setText(messageNode, "Paciente salvo, mas a notificação não foi enviada por falha de conexão.")
+  }
 }
 
 async function markPatientRemoved(id) {
@@ -1294,6 +1348,8 @@ async function exportCsv() {
       patient.nome,
       patient.registro_hospitalar,
       patient.telefone,
+      patient.contato_sms_autorizado ? "Sim" : "Não",
+      patient.contato_whatsapp_autorizado ? "Sim" : "Não",
       patient.sexo,
       patient.data_colocacao,
       patient.prazo_retirada_meses,
@@ -1316,6 +1372,8 @@ async function exportCsv() {
     "nome",
     "registro_hospitalar",
     "telefone",
+    "sms_autorizado",
+    "whatsapp_autorizado",
     "sexo",
     "data_colocacao",
     "prazo_retirada_meses",

@@ -64,7 +64,9 @@ alter table public.pacientes
   add column if not exists updated_at timestamptz not null default now(),
   add column if not exists prazo_retirada_meses integer not null default 3,
   add column if not exists prazo_retirada_dias integer not null default 0,
-  add column if not exists data_prazo_retirada date;
+  add column if not exists data_prazo_retirada date,
+  add column if not exists contato_sms_autorizado boolean not null default false,
+  add column if not exists contato_whatsapp_autorizado boolean not null default false;
 
 update public.pacientes
 set data_prazo_retirada = coalesce(data_prazo_retirada, data_3_meses, data_colocacao + interval '3 months')
@@ -87,6 +89,25 @@ create table if not exists public.patient_audit_log (
 );
 
 alter table public.patient_audit_log enable row level security;
+
+create table if not exists public.patient_notifications (
+  id uuid primary key default gen_random_uuid(),
+  patient_id uuid,
+  target_table text not null default 'pacientes',
+  notification_type text not null,
+  channel text not null check (channel in ('sms', 'whatsapp')),
+  destination text not null,
+  status text not null default 'pending',
+  error_message text,
+  sent_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+alter table public.patient_notifications enable row level security;
+
+create unique index if not exists patient_notifications_unique_sent
+on public.patient_notifications (patient_id, target_table, notification_type, channel)
+where status = 'sent';
 
 create table if not exists public.pacientes_troca_programada (
   id uuid primary key default gen_random_uuid(),
@@ -195,6 +216,18 @@ using (public.is_approved_user());
 drop policy if exists "audit_insert_approved" on public.patient_audit_log;
 create policy "audit_insert_approved"
 on public.patient_audit_log
+for insert
+with check (public.is_approved_user());
+
+drop policy if exists "notifications_select_admin" on public.patient_notifications;
+create policy "notifications_select_admin"
+on public.patient_notifications
+for select
+using (public.is_admin_user());
+
+drop policy if exists "notifications_insert_approved" on public.patient_notifications;
+create policy "notifications_insert_approved"
+on public.patient_notifications
 for insert
 with check (public.is_approved_user());
 

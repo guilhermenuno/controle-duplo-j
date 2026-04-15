@@ -1,6 +1,12 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "crons": [
+    {
+      "path": "/api/check-deadlines",
+      "schedule": "0 10 * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

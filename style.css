@@ -716,6 +716,14 @@ code {
   background: rgba(14, 91, 82, 0.04);
 }
 
+.consent-panel {
+  margin: 16px 0;
+  border: 1px solid rgba(14, 91, 82, 0.12);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  background: rgba(14, 91, 82, 0.04);
+}
+
 .checkbox-label {
   display: flex;
   align-items: center;
