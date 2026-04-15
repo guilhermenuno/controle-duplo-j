@@ -21,6 +21,14 @@ function getEnv(name) {
   return value
 }
 
+function getSupabaseServiceKey() {
+  const value = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY
+  if (!value) {
+    throw new Error("Variável de ambiente ausente: SUPABASE_SERVICE_ROLE_KEY. Adicione a service_role key no projeto controle-duplo-j da Vercel e faça redeploy.")
+  }
+  return value
+}
+
 function json(response, status, data) {
   response.statusCode = status
   response.setHeader("Content-Type", "application/json")
@@ -51,7 +59,7 @@ function basicAuth(accountSid, authToken) {
 
 async function supabaseFetch(path, options = {}) {
   const url = `${getEnv("SUPABASE_URL").replace(/\/$/, "")}${path}`
-  const serviceKey = getEnv("SUPABASE_SERVICE_ROLE_KEY")
+  const serviceKey = getSupabaseServiceKey()
 
   const response = await fetch(url, {
     ...options,
@@ -77,7 +85,7 @@ async function supabaseFetch(path, options = {}) {
 async function verifyApprovedUser(accessToken) {
   const userResponse = await fetch(`${getEnv("SUPABASE_URL").replace(/\/$/, "")}/auth/v1/user`, {
     headers: {
-      apikey: getEnv("SUPABASE_SERVICE_ROLE_KEY"),
+      apikey: getSupabaseServiceKey(),
       Authorization: `Bearer ${accessToken}`
     }
   })
