@@ -1,12 +1,12 @@
 const NOTIFICATION_MESSAGES = {
   cadastro:
-    "Olá, este é um aviso do serviço de Urologia. Seu cadastro para acompanhamento do cateter duplo J foi registrado. Em caso de dúvidas, procure o serviço responsável.",
+    "AVISO DO SERVICO DE UROLOGIA DO HOSPITAL DAS CLINICAS - UFPE: SEU CADASTRO PARA ACOMPANHAMENTO DO CATETER DUPLO J FOI REGISTRADO. NAO ENVIAREMOS LINKS, COBRANCAS, PEDIDOS DE DINHEIRO OU DOCUMENTOS. NAO RESPONDA ESTA MENSAGEM; ESTE NUMERO E APENAS UM CANAL DE AVISO.",
   proximo_prazo:
-    "Olá, este é um aviso do serviço de Urologia. Seu acompanhamento do cateter duplo J está próximo do prazo previsto. Procure o serviço responsável para orientação.",
+    "AVISO DO SERVICO DE UROLOGIA DO HOSPITAL DAS CLINICAS - UFPE: SEU ACOMPANHAMENTO DO CATETER DUPLO J ESTA PROXIMO DO PRAZO PREVISTO. PROCURE O SERVICO RESPONSAVEL PARA ORIENTACAO. NAO ENVIAREMOS LINKS, COBRANCAS, PEDIDOS DE DINHEIRO OU DOCUMENTOS. NAO RESPONDA ESTA MENSAGEM.",
   prazo_atingido:
-    "Olá, este é um aviso do serviço de Urologia. O prazo previsto para acompanhamento/retirada do cateter duplo J foi atingido. Procure o serviço responsável.",
+    "AVISO DO SERVICO DE UROLOGIA DO HOSPITAL DAS CLINICAS - UFPE: O PRAZO PREVISTO PARA ACOMPANHAMENTO OU RETIRADA DO CATETER DUPLO J FOI ATINGIDO. PROCURE O SERVICO RESPONSAVEL. NAO ENVIAREMOS LINKS, COBRANCAS, PEDIDOS DE DINHEIRO OU DOCUMENTOS. NAO RESPONDA ESTA MENSAGEM.",
   maior_6_meses:
-    "Olá, este é um aviso do serviço de Urologia. Consta acompanhamento de cateter duplo J há mais de 6 meses. Procure o serviço responsável para avaliação."
+    "AVISO DO SERVICO DE UROLOGIA DO HOSPITAL DAS CLINICAS - UFPE: CONSTA ACOMPANHAMENTO DE CATETER DUPLO J HA MAIS DE 6 MESES. PROCURE O SERVICO RESPONSAVEL PARA AVALIACAO. NAO ENVIAREMOS LINKS, COBRANCAS, PEDIDOS DE DINHEIRO OU DOCUMENTOS. NAO RESPONDA ESTA MENSAGEM."
 }
 
 const DEFAULT_SUPABASE_URL = "https://forbdpfbuuwbqcwvscjq.supabase.co"
