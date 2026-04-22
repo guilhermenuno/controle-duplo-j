@@ -224,11 +224,11 @@ function setActiveSection(section) {
 
   const titles = {
     dashboard: "Visão geral",
-    "cadastro-retirada": "Cadastro de retirada",
+    "cadastro-retirada": "Cadastrar retirada",
     "lista-retirada": "Pacientes em acompanhamento",
-    "historico-retirada": "Histórico de retirados",
-    "cadastro-troca": "Cadastro de trocas periódicas",
-    "lista-troca": "Lista de trocas programadas",
+    "historico-retirada": "Histórico de retiradas",
+    "cadastro-troca": "Cadastrar troca",
+    "lista-troca": "Trocas programadas",
     acesso: "Gestão de acesso"
   }
 
@@ -326,7 +326,7 @@ function resetTrocaForm() {
   document.getElementById("trocaIntervaloMeses").value = "3"
   document.getElementById("trocaIntervaloDias").value = "0"
   document.getElementById("trocaObservacoes").value = ""
-  trocaFormTitulo.innerText = "Novo paciente de troca periódica"
+  trocaFormTitulo.innerText = "Cadastrar troca programada"
   btnCancelarEdicaoTroca.classList.add("is-hidden")
   mensagemTroca.innerText = ""
 }
@@ -345,7 +345,7 @@ function resetPacienteForm() {
   document.getElementById("observacoes").value = ""
   document.getElementById("cistoscopiaQuarta").checked = false
   document.getElementById("cistoscopiaGroup").classList.add("is-hidden")
-  pacienteFormTitulo.innerText = "Novo paciente de retirada"
+  pacienteFormTitulo.innerText = "Cadastrar retirada"
   btnCancelarEdicaoPaciente.classList.add("is-hidden")
   mensagemCadastro.innerText = ""
 }
@@ -471,9 +471,9 @@ function renderPatientCard(patient, mode) {
         </div>
       </summary>
       <div class="patient-content">
-        ${patient.cistoscopia_quarta && !isHistory ? '<div class="cistoscopia-badge">Cistoscopia às quartas (manhã)</div>' : ''}
+        ${patient.cistoscopia_quarta && !isHistory ? '<div class="cistoscopia-badge">Cistoscopia às quartas pela manhã</div>' : ''}
         <div class="patient-meta">
-          <div class="meta-line"><strong>Contato</strong><span>${patient.telefone || "-"}</span></div>
+          <div class="meta-line"><strong>Telefone</strong><span>${patient.telefone || "-"}</span></div>
           <div class="meta-line"><strong>SMS autorizado</strong><span>${patient.contato_sms_autorizado ? "Sim" : "Não"}</span></div>
           <div class="meta-line"><strong>WhatsApp autorizado</strong><span>${patient.contato_whatsapp_autorizado ? "Sim" : "Não"}</span></div>
           <div class="meta-line"><strong>Sexo</strong><span>${patient.sexo === "feminino" ? "Feminino" : patient.sexo === "masculino" ? "Masculino" : "-"}</span></div>
@@ -500,7 +500,7 @@ function renderPatientCard(patient, mode) {
               : ""
             : `<div class="patient-actions">
                 <button type="button" class="secondary-button" data-action="editar-paciente" data-id="${patient.id}">Editar prazo/dados</button>
-                <button type="button" data-action="retirar-paciente" data-id="${patient.id}">DJ retirado</button>
+                <button type="button" data-action="retirar-paciente" data-id="${patient.id}">Registrar retirada</button>
                 ${
                   isAdmin()
                     ? `<button type="button" class="danger-button" data-action="excluir-paciente" data-id="${patient.id}">Excluir registro</button>`
@@ -537,7 +537,7 @@ function renderTrocaCard(item, statusKey) {
       </summary>
       <div class="patient-content">
         <div class="patient-meta">
-          <div class="meta-line"><strong>Contato</strong><span>${item.telefone || "-"}</span></div>
+          <div class="meta-line"><strong>Telefone</strong><span>${item.telefone || "-"}</span></div>
           <div class="meta-line"><strong>Última troca</strong><span>${formatDate(item.ultima_troca_data)}</span></div>
           <div class="meta-line"><strong>Próxima troca</strong><span>${formatDate(item.proxima_troca_data)}</span></div>
           <div class="meta-line"><strong>Intervalo</strong><span>${item.intervalo_meses} mês(es) e ${item.intervalo_dias} dia(s)</span></div>
@@ -686,7 +686,7 @@ async function loadPatients() {
 
     if (hoje >= d6) {
       patient.visualClass = "vencido6"
-      patient.visualStatus = "Convocar consulta / imagem"
+      patient.visualStatus = "Convocar consulta/imagem"
       target = listaImagem
       imagem++
     } else if (hoje >= dataLimiteRetirada) {
@@ -990,7 +990,7 @@ async function loadPatientIntoForm(id) {
   document.getElementById("prazoRetiradaDias").value = data.prazo_retirada_dias ?? 0
   document.getElementById("observacoes").value = data.observacoes || ""
   document.getElementById("cistoscopiaQuarta").checked = Boolean(data.cistoscopia_quarta)
-  pacienteFormTitulo.innerText = "Editar paciente de retirada"
+  pacienteFormTitulo.innerText = "Editar retirada"
   btnCancelarEdicaoPaciente.classList.remove("is-hidden")
   mensagemCadastro.innerText = ""
   checkCistoscopiaEligibility()
@@ -1165,7 +1165,7 @@ async function saveTrocaProgramada() {
   })
 
   resetTrocaForm()
-  setText(mensagemTroca, "Programação de troca salva com sucesso.")
+  setText(mensagemTroca, "Troca salva.")
   await loadTrocasProgramadas()
 }
 
@@ -1189,7 +1189,7 @@ async function loadTrocaIntoForm(id) {
   document.getElementById("trocaIntervaloMeses").value = data.intervalo_meses
   document.getElementById("trocaIntervaloDias").value = data.intervalo_dias
   document.getElementById("trocaObservacoes").value = data.observacoes || ""
-  trocaFormTitulo.innerText = "Editar paciente de troca periódica"
+  trocaFormTitulo.innerText = "Editar troca programada"
   btnCancelarEdicaoTroca.classList.remove("is-hidden")
   setActiveSection("cadastro-troca")
 }

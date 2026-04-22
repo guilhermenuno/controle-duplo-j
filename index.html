@@ -39,7 +39,7 @@
           </div>
         </div>
 
-        <p class="auth-intro">Controle interno de retirada e trocas programadas de cateter duplo J.</p>
+        <p class="auth-intro">Acesso interno para acompanhamento de retirada e trocas programadas de Duplo J.</p>
 
         <div class="auth-tabs">
           <button id="tabLogin" class="tab-button is-active" type="button">Login</button>
@@ -101,11 +101,11 @@
         </div>
 
         <nav class="sidebar-nav">
-          <button id="navCadastroRetirada" class="nav-link" type="button">Cadastro retirada</button>
-          <button id="navCadastroTroca" class="nav-link" type="button">Cadastro troca</button>
+          <button id="navCadastroRetirada" class="nav-link" type="button">Cadastrar retirada</button>
+          <button id="navCadastroTroca" class="nav-link" type="button">Cadastrar troca</button>
           <button id="navListaRetirada" class="nav-link" type="button">Em acompanhamento</button>
-          <button id="navHistoricoRetirada" class="nav-link" type="button">Histórico retirados</button>
-          <button id="navListaTroca" class="nav-link" type="button">Lista trocas</button>
+          <button id="navHistoricoRetirada" class="nav-link" type="button">Histórico de retiradas</button>
+          <button id="navListaTroca" class="nav-link" type="button">Trocas programadas</button>
           <button id="navAcesso" class="nav-link is-hidden" type="button">Gestão de acesso</button>
         </nav>
 
@@ -142,7 +142,7 @@
             <section class="card">
               <div class="card-heading">
                 <div>
-                  <p class="eyebrow">Resumo operacional</p>
+                  <p class="eyebrow">Retirada</p>
                   <h2>Retirada / acompanhamento</h2>
                 </div>
               </div>
@@ -170,7 +170,7 @@
             <section class="card">
               <div class="card-heading">
                 <div>
-                  <p class="eyebrow">Resumo operacional</p>
+                  <p class="eyebrow">Trocas</p>
                   <h2>Trocas programadas</h2>
                 </div>
               </div>
@@ -200,32 +200,32 @@
             <div class="card-heading">
               <div>
                 <p class="eyebrow">Cadastro</p>
-                <h2 id="pacienteFormTitulo">Novo paciente de retirada</h2>
+                <h2 id="pacienteFormTitulo">Cadastrar retirada</h2>
               </div>
             </div>
 
             <input type="hidden" id="pacienteId">
 
             <label class="field-label" for="nome">Nome do paciente</label>
-            <input type="text" id="nome" placeholder="Nome do paciente" disabled>
+            <input type="text" id="nome" placeholder="Ex.: Maria Silva" disabled>
 
             <label class="field-label" for="registro">Registro hospitalar</label>
             <input type="text" id="registro" placeholder="Registro hospitalar" disabled>
 
-            <label class="field-label" for="telefone">Contato</label>
-            <input type="text" id="telefone" placeholder="Telefone" disabled>
+            <label class="field-label" for="telefone">Telefone</label>
+            <input type="text" id="telefone" placeholder="+5581999999999" disabled>
 
             <div class="consent-panel">
               <p class="field-label">Autorização de contato</p>
               <label class="checkbox-label">
                 <input type="checkbox" id="contatoSmsAutorizado" disabled>
-                <span>Paciente autorizou receber SMS sobre o acompanhamento do Duplo J</span>
+                <span>Autoriza SMS</span>
               </label>
               <label class="checkbox-label">
                 <input type="checkbox" id="contatoWhatsappAutorizado" disabled>
-                <span>Paciente autorizou receber WhatsApp sobre o acompanhamento do Duplo J</span>
+                <span>Autoriza WhatsApp</span>
               </label>
-              <p class="cistoscopia-hint">Use mensagens sem diagnóstico ou detalhes sensíveis. O telefone deve estar no padrão +55DDDnumero.</p>
+              <p class="cistoscopia-hint">Use somente mensagens operacionais. Não inclua diagnóstico, links ou solicitações.</p>
             </div>
 
             <label class="field-label" for="sexo">Sexo</label>
@@ -252,9 +252,9 @@
             <div id="cistoscopiaGroup" class="cistoscopia-group is-hidden">
               <label class="checkbox-label">
                 <input type="checkbox" id="cistoscopiaQuarta" checked>
-                <span>Agendar para cistoscopia às quartas (manhã)</span>
+                <span>Cistoscopia às quartas pela manhã</span>
               </label>
-              <p class="cistoscopia-hint">Paciente feminina com DJ &lt; 6 meses — elegível para retirada por cistoscopia às quartas pela manhã.</p>
+              <p class="cistoscopia-hint">Opção indicada para paciente feminina com Duplo J há menos de 6 meses.</p>
             </div>
 
             <label class="field-label" for="observacoes">Observações</label>
@@ -283,7 +283,7 @@
             </div>
 
             <div class="list-group">
-              <h3>Convocar consulta / imagem ( &gt; 6 meses )</h3>
+              <h3>Convocar consulta/imagem</h3>
               <div id="listaImagem" class="patient-list"></div>
             </div>
 
@@ -299,7 +299,7 @@
             <div class="card-heading">
               <div>
                 <p class="eyebrow">Histórico</p>
-                <h2>Pacientes com DJ retirado</h2>
+                <h2>Histórico de retiradas</h2>
               </div>
             </div>
             <div id="listaRetirados" class="patient-list">
@@ -313,20 +313,20 @@
             <div class="card-heading">
               <div>
                 <p class="eyebrow">Programação</p>
-                <h2 id="trocaFormTitulo">Novo paciente de troca periódica</h2>
+                <h2 id="trocaFormTitulo">Cadastrar troca programada</h2>
               </div>
             </div>
 
             <input type="hidden" id="trocaId">
 
             <label class="field-label" for="trocaNome">Nome do paciente</label>
-            <input type="text" id="trocaNome" placeholder="Nome do paciente" disabled>
+            <input type="text" id="trocaNome" placeholder="Ex.: Maria Silva" disabled>
 
             <label class="field-label" for="trocaRegistro">Registro hospitalar</label>
             <input type="text" id="trocaRegistro" placeholder="Registro hospitalar" disabled>
 
-            <label class="field-label" for="trocaTelefone">Contato</label>
-            <input type="text" id="trocaTelefone" placeholder="Telefone" disabled>
+            <label class="field-label" for="trocaTelefone">Telefone</label>
+            <input type="text" id="trocaTelefone" placeholder="+5581999999999" disabled>
 
             <label class="field-label" for="trocaUltimaData">Última troca realizada</label>
             <input type="date" id="trocaUltimaData" disabled>
@@ -346,7 +346,7 @@
             <textarea id="trocaObservacoes" placeholder="Notas sobre rotina de troca" disabled></textarea>
 
             <div class="actions-row">
-              <button id="salvarTroca" type="button" disabled>Salvar programação</button>
+              <button id="salvarTroca" type="button" disabled>Salvar troca</button>
               <button id="cancelarEdicaoTroca" type="button" class="secondary-button is-hidden">Cancelar edição</button>
             </div>
             <p id="mensagemTroca" class="helper-text"></p>
@@ -362,7 +362,7 @@
               </div>
             </div>
 
-            <p class="helper-text">Os pacientes desta área ficam em controle cíclico, sem saírem definitivamente da lista.</p>
+            <p class="helper-text">Use esta lista para pacientes com troca recorrente de Duplo J.</p>
 
             <div class="list-group">
               <h3>Trocas atrasadas</h3>
