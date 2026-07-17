@@ -1,7 +1,8 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js"
+import { html, renderSafeHtml } from "./safe-html.mjs"
 
 const supabaseUrl = "https://forbdpfbuuwbqcwvscjq.supabase.co"
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvcmJkcGZidXV3YnFjd3ZzY2pxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzcwMjYsImV4cCI6MjA4ODg1MzAyNn0.fHgxkQlWjjss7DC3lL27EE6n7LWQQ0Ly3eQ_6YQRqEM"
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdWJhYmFzZSIsInJlZiI6ImZvcmJkcGZidXV3YnFjd3ZzY2pxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzcwMjYsImV4cCI6MjA4ODg1MzAyNn0.fHgxkQlWjjss7DC3lL27EE6n7LWQQ0Ly3eQ_6YQRqEM" // nosemgrep: generic.secrets.security.detected-jwt-token.detected-jwt-token -- Supabase anon key is intentionally public; RLS is the authorization boundary.
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
@@ -115,15 +116,26 @@ const camposProtegidos = [
   document.getElementById("trocaObservacoes")
 ]
 
-function createCard(className, html, tagName = "article") {
+function createCard(className, content, tagName = "article") {
   const card = document.createElement(tagName)
   card.className = className
-  card.innerHTML = html
+  card.innerHTML = renderSafeHtml(content)
   return card
 }
 
 function setText(node, value) {
   node.innerText = value
+}
+
+function clearNode(node) {
+  node.replaceChildren()
+}
+
+function setEmptyState(node, message) {
+  const emptyState = document.createElement("p")
+  emptyState.className = "empty-state"
+  setText(emptyState, message)
+  node.replaceChildren(emptyState)
 }
 
 function formatDate(dateValue) {
@@ -256,7 +268,7 @@ function clearLists() {
     listaTrocaPrazo,
     listaAprovacoes
   ].forEach((list) => {
-    list.innerHTML = ""
+    clearNode(list)
   })
 }
 
@@ -455,7 +467,7 @@ function renderPatientCard(patient, mode) {
 
   return createCard(
     `patient-card ${isHistory ? "retirado" : patient.visualClass}`,
-    `
+    html`
       <summary class="patient-summary">
         <div class="patient-summary-main">
           <span class="status-chip">${patient.visualStatus}</span>
@@ -471,7 +483,7 @@ function renderPatientCard(patient, mode) {
         </div>
       </summary>
       <div class="patient-content">
-        ${patient.cistoscopia_quarta && !isHistory ? '<div class="cistoscopia-badge">Cistoscopia às quartas pela manhã</div>' : ''}
+        ${patient.cistoscopia_quarta && !isHistory ? html`<div class="cistoscopia-badge">Cistoscopia às quartas pela manhã</div>` : html``}
         <div class="patient-meta">
           <div class="meta-line"><strong>Telefone</strong><span>${patient.telefone || "-"}</span></div>
           <div class="meta-line"><strong>SMS autorizado</strong><span>${patient.contato_sms_autorizado ? "Sim" : "Não"}</span></div>
@@ -485,26 +497,26 @@ function renderPatientCard(patient, mode) {
           <div class="meta-line"><strong>Incluído em</strong><span>${formatDateTime(patient.created_at)}</span></div>
           ${
             isHistory
-              ? `<div class="meta-line"><strong>Retirado por</strong><span>${removedBy}</span></div>
+              ? html`<div class="meta-line"><strong>Retirado por</strong><span>${removedBy}</span></div>
                  <div class="meta-line"><strong>Retirado em</strong><span>${formatDate(patient.data_retirada)}</span></div>`
-              : ""
+              : html``
           }
           <div class="meta-line"><strong>Observações</strong><span>${patient.observacoes || "-"}</span></div>
         </div>
         ${
           isHistory
             ? isAdmin()
-              ? `<div class="patient-actions">
+              ? html`<div class="patient-actions">
                    <button type="button" class="danger-button" data-action="excluir-paciente" data-id="${patient.id}">Excluir registro</button>
                  </div>`
-              : ""
-            : `<div class="patient-actions">
+              : html``
+            : html`<div class="patient-actions">
                 <button type="button" class="secondary-button" data-action="editar-paciente" data-id="${patient.id}">Editar prazo/dados</button>
                 <button type="button" data-action="retirar-paciente" data-id="${patient.id}">Registrar retirada</button>
                 ${
                   isAdmin()
-                    ? `<button type="button" class="danger-button" data-action="excluir-paciente" data-id="${patient.id}">Excluir registro</button>`
-                    : ""
+                    ? html`<button type="button" class="danger-button" data-action="excluir-paciente" data-id="${patient.id}">Excluir registro</button>`
+                    : html``
                 }
               </div>`
         }
@@ -520,7 +532,7 @@ function renderTrocaCard(item, statusKey) {
 
   return createCard(
     `patient-card ${classe}`,
-    `
+    html`
       <summary class="patient-summary">
         <div class="patient-summary-main">
           <span class="status-chip">${subtitle}</span>
@@ -551,8 +563,8 @@ function renderTrocaCard(item, statusKey) {
           <button type="button" class="secondary-button" data-action="encerrar-troca" data-id="${item.id}">Encerrar controle</button>
           ${
             isAdmin()
-              ? `<button type="button" class="danger-button" data-action="excluir-troca" data-id="${item.id}">Excluir registro</button>`
-              : ""
+              ? html`<button type="button" class="danger-button" data-action="excluir-troca" data-id="${item.id}">Excluir registro</button>`
+              : html``
           }
         </div>
       </div>
@@ -564,7 +576,7 @@ function renderTrocaCard(item, statusKey) {
 function renderAdminCard(profile) {
   return createCard(
     "admin-card",
-    `
+    html`
       <h4>${profile.full_name || profile.email || "Usuário sem nome"}</h4>
       <div class="patient-meta">
         <div class="meta-line"><strong>Email</strong><span>${profile.email || "-"}</span></div>
@@ -655,10 +667,10 @@ async function loadPatients() {
     return
   }
 
-  listaPrazo.innerHTML = ""
-  listaVencidos.innerHTML = ""
-  listaImagem.innerHTML = ""
-  listaRetirados.innerHTML = ""
+  clearNode(listaPrazo)
+  clearNode(listaVencidos)
+  clearNode(listaImagem)
+  clearNode(listaRetirados)
 
   let ativos = 0
   let vencidos = 0
@@ -700,19 +712,19 @@ async function loadPatients() {
   })
 
   if (!listaVencidos.children.length) {
-    listaVencidos.innerHTML = '<p class="empty-state">Nenhum paciente vencido.</p>'
+    setEmptyState(listaVencidos, "Nenhum paciente vencido.")
   }
 
   if (!listaImagem.children.length) {
-    listaImagem.innerHTML = '<p class="empty-state">Nenhum paciente para convocação.</p>'
+    setEmptyState(listaImagem, "Nenhum paciente para convocação.")
   }
 
   if (!listaPrazo.children.length) {
-    listaPrazo.innerHTML = '<p class="empty-state">Nenhum paciente no prazo.</p>'
+    setEmptyState(listaPrazo, "Nenhum paciente no prazo.")
   }
 
   if (!listaRetirados.children.length) {
-    listaRetirados.innerHTML = '<p class="empty-state">Nenhum paciente retirado.</p>'
+    setEmptyState(listaRetirados, "Nenhum paciente retirado.")
   }
 
   state.metrics.ativos = ativos
@@ -736,9 +748,9 @@ async function loadTrocasProgramadas() {
     return
   }
 
-  listaTrocaAtrasada.innerHTML = ""
-  listaTrocaProxima.innerHTML = ""
-  listaTrocaPrazo.innerHTML = ""
+  clearNode(listaTrocaAtrasada)
+  clearNode(listaTrocaProxima)
+  clearNode(listaTrocaPrazo)
 
   let total = 0
   let proximas = 0
@@ -764,15 +776,15 @@ async function loadTrocasProgramadas() {
   })
 
   if (!listaTrocaAtrasada.children.length) {
-    listaTrocaAtrasada.innerHTML = '<p class="empty-state">Nenhuma troca atrasada.</p>'
+    setEmptyState(listaTrocaAtrasada, "Nenhuma troca atrasada.")
   }
 
   if (!listaTrocaProxima.children.length) {
-    listaTrocaProxima.innerHTML = '<p class="empty-state">Nenhuma troca próxima.</p>'
+    setEmptyState(listaTrocaProxima, "Nenhuma troca próxima.")
   }
 
   if (!listaTrocaPrazo.children.length) {
-    listaTrocaPrazo.innerHTML = '<p class="empty-state">Nenhuma troca programada em prazo confortável.</p>'
+    setEmptyState(listaTrocaPrazo, "Nenhuma troca programada em prazo confortável.")
   }
 
   state.metrics.trocas = total
@@ -783,7 +795,7 @@ async function loadTrocasProgramadas() {
 
 async function loadPendingApprovals() {
   if (state.currentProfile?.role !== "admin") {
-    listaAprovacoes.innerHTML = '<p class="empty-state">Apenas administradores podem gerenciar acessos.</p>'
+    setEmptyState(listaAprovacoes, "Apenas administradores podem gerenciar acessos.")
     return
   }
 
@@ -795,13 +807,13 @@ async function loadPendingApprovals() {
     .order("created_at", { ascending: true })
 
   if (error) {
-    listaAprovacoes.innerHTML = `<p class="empty-state">Erro ao carregar aprovações: ${error.message}</p>`
+    setEmptyState(listaAprovacoes, `Erro ao carregar aprovações: ${error.message}`)
     return
   }
 
-  listaAprovacoes.innerHTML = ""
+  clearNode(listaAprovacoes)
   if (!data.length) {
-    listaAprovacoes.innerHTML = '<p class="empty-state">Nenhuma solicitação pendente.</p>'
+    setEmptyState(listaAprovacoes, "Nenhuma solicitação pendente.")
     return
   }
 

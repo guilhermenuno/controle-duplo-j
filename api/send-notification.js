@@ -45,6 +45,7 @@ module.exports = async function handler(request, response) {
     const result = await sendPatientNotification(patient, notificationType)
     json(response, 200, result)
   } catch (error) {
-    json(response, 500, { error: error.message })
+    console.error("Patient notification failed", { name: error.name })
+    json(response, 500, { error: "Falha interna ao enviar notificação." })
   }
 }
