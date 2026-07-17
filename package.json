@@ -1,0 +1,9 @@
+{
+  "name": "controle-duplo-j",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.*",
+    "test:rls": "bash tests/run-rls-migration-test.sh",
+    "check": "node --check api/_notifications.js && node --check api/check-deadlines.js && node --check api/send-notification.js && node --check safe-html.mjs"
+  }
+}

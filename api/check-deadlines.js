@@ -1,3 +1,5 @@
+const { timingSafeEqual } = require("node:crypto")
+
 const {
   daysBetween,
   json,
@@ -6,12 +8,20 @@ const {
   todayDateString
 } = require("./_notifications")
 
+function constantTimeEqual(left, right) {
+  const leftBuffer = Buffer.from(left)
+  const rightBuffer = Buffer.from(right)
+
+  if (leftBuffer.length !== rightBuffer.length) return false
+  return timingSafeEqual(leftBuffer, rightBuffer)
+}
+
 function isAuthorizedCron(request) {
   const secret = process.env.CRON_SECRET
-  if (!secret) return true
+  if (!secret) return false
 
-  const header = request.headers.authorization || ""
-  return header === `Bearer ${secret}`
+  const header = request.headers?.authorization || ""
+  return constantTimeEqual(header, `Bearer ${secret}`)
 }
 
 function notificationTypesForPatient(patient, today) {
@@ -34,7 +44,7 @@ function notificationTypesForPatient(patient, today) {
   return types
 }
 
-module.exports = async function handler(request, response) {
+async function handler(request, response) {
   if (!isAuthorizedCron(request)) {
     json(response, 401, { error: "Cron não autorizado." })
     return
@@ -46,26 +56,30 @@ module.exports = async function handler(request, response) {
       "/rest/v1/pacientes?data_retirada=is.null&status=eq.ativo&select=*"
     )
 
-    const results = []
+    const summary = {
+      checked: patients.length,
+      notifications: 0,
+      sent: 0,
+      skipped: 0
+    }
 
     for (const patient of patients) {
       const notificationTypes = notificationTypesForPatient(patient, today)
 
       for (const notificationType of notificationTypes) {
         const result = await sendPatientNotification(patient, notificationType)
-        results.push({
-          patientId: patient.id,
-          notificationType,
-          ...result
-        })
+        summary.notifications++
+        summary.sent += result.sent || 0
+        if (!result.sent) summary.skipped++
       }
     }
 
-    json(response, 200, {
-      checked: patients.length,
-      results
-    })
+    json(response, 200, summary)
   } catch (error) {
-    json(response, 500, { error: error.message })
+    console.error("Deadline notification check failed", { name: error.name })
+    json(response, 500, { error: "Falha interna ao verificar prazos." })
   }
 }
+
+module.exports = handler
+module.exports.isAuthorizedCron = isAuthorizedCron
