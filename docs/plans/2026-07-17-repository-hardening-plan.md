@@ -35,6 +35,13 @@ Até concluir a Onda 0, recomenda-se:
 
 Prazo recomendado: mesmo dia, com janela controlada.
 
+Estado em 17 de julho de 2026:
+
+- **Aplicado em produção:** novos cadastros desativados; migration RLS `20260717180000`; 14 políticas protegidas; zero políticas legadas; Security Advisor com 0 erros e Performance Advisor com 0 avisos.
+- **Validado no PR #1:** cron fail-closed, saída agregada, XSS inerte, CSP/headers, 12 testes Node, teste RLS em PostgreSQL isolado e Semgrep sem achados.
+- **Pendente de owner/revisão:** merge e deploy da aplicação, confirmação de `CRON_SECRET` na Vercel do Guilherme, revisão de logs/sessões e decisão sobre os três avisos residuais do Security Advisor.
+- **Risco residual de recuperação:** o plano Free não ofereceu backup restaurável de dados; a exceção desta janela foi restrita a DDL transacional sem alteração de linhas e snapshots pré/pós de esquema. Mudanças futuras de dados continuam bloqueadas sem backup adequado.
+
 ### 0.1 Preparar recuperação antes da mudança
 
 - definir owner técnico e owner clínico da janela;
